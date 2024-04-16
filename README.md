@@ -1,73 +1,118 @@
-# UnrealRenderStreamingExample
-
-Sample project demonstrating how to set up unreal render streaming within a JavaScript framework.
-
-This project is supposed to be a basic walkthrough of setting up the Unreal Pixel streaming within an iFrame rather than a fully fleshed out project. It should be used as a basis build on top of.
-
-## Overview
-
-Setting up pixel streaming with an iFrame is a pretty straight forward process, there really isn't much to it.
-For demonstration this simple Vue.js app includes an iFrame to the default pixel streaming example provided by unreal, and uses the JavaScript method .postMessage() and standard event listeners to allow cross-origin communication between the Vue app and Signalling Server. In this example we're sending a custom message to the Signalling Server using a simple button click event as the trigger. We're also adding an event listener on the mounted Vue lifecycle hook to recieve messages sent from the Signalling Server to the Vue front end, this is logged out and set up as an alert, but should provide enough context to use the response in any capacity within the Vue app.
-
-The iFrame aspect ratio is maintained by using bound computed properties for the width and height.
-Scene interactivity is handled by the Signalling Server within the iFrame content window, this can be seen as the cursor crosses the boundary between Vue app and iFrame. This cursor behaviour is enabled by the Singalling Server using the inputOptions object with a choice between LockedMouse and HoveringMouse, using HoveringMouse removes the need to click on the iFrame to enable interactions.
-
-The unreal application itself is set up in the same way it would to handle any pixel streaming input / output. The example we use for this project simply logs a message recieved and sends the name of the object clicked. Below we include screenshots of the blueprints used to manage the scene (all of it is simply placed in the level blueprint), however for full documentation on the unreal application setup; the documentation found [here.](https://docs.unrealengine.com/en-US/Platforms/PixelStreaming/index.html)
-
-
-## (Front End) Send Message via iFrame
-Below is an example of how to send the message via the iFrame.
-
-```javascript
-// Send a json message via the iFrame
-document.getElementById("myIframe").contentWindow.postMessage(JSON.stringify(this.jsonMessage), "*");
-```
-
-In our version we use a basic JSON object with a type property to allow more flexible handling of the data
-```javascript
-window.onmessage = function(messageFromVue) {
-   console.log("Message recieved on Signalling Server: " + messageFromVue.data);
+<div class="Box-sc-g0xbh4-0 bJMeLZ js-snippet-clipboard-copy-unpositioned" data-hpc="true"><article class="markdown-body entry-content container-lg" itemprop="text"><div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">UnrealRenderStreaming示例</font></font></h1><a id="user-content-unrealrenderstreamingexample" class="anchor" aria-label="永久链接：UnrealRenderStreamingExample" href="#unrealrenderstreamingexample"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">演示如何在 JavaScript 框架内设置虚幻渲染流的示例项目。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">该项目应该是在 iFrame 中设置虚幻像素流的基本演练，而不是一个完全充实的项目。它应该作为构建在其之上的基础。</font></font></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">概述</font></font></h2><a id="user-content-overview" class="anchor" aria-label="永久链接：概述" href="#overview"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 iFrame 设置像素流是一个非常简单的过程，实际上没有太多内容。为了进行演示，这个简单的 Vue.js 应用程序包含一个由 unreal 提供的默认像素流示例的 iFrame，并使用 JavaScript 方法 .postMessage() 和标准事件侦听器来允许 Vue 应用程序和信令服务器之间的跨源通信。在此示例中，我们使用简单的按钮单击事件作为触发器向信令服务器发送自定义消息。我们还在已安装的 Vue 生命周期挂钩上添加了一个事件侦听器，以接收从信令服务器发送到 Vue 前端的消息，这会被注销并设置为警报，但应提供足够的上下文以在任何情况下使用响应Vue 应用程序中的容量。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">iFrame 的纵横比是通过使用宽度和高度的绑定计算属性来维护的。场景交互性由 iFrame 内容窗口内的信令服务器处理，这可以在光标穿过 Vue 应用程序和 iFrame 之间的边界时看到。此光标行为由 Singalling Server 使用 inputOptions 对象启用，并在 LockedMouse 和 HoveringMouse 之间进行选择，使用 HoveringMouse 无需单击 iFrame 即可启用交互。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">虚幻应用程序本身的设置方式与处理任何像素流输入/输出的方式相同。我们用于该项目的示例只是记录收到的消息并发送单击的对象的名称。下面我们提供了用于管理场景的蓝图的屏幕截图（所有这些都简单地放置在关卡蓝图中），但是有关虚幻应用程序设置的完整文档；此处</font><font style="vertical-align: inherit;">找到的文档</font></font><a href="https://docs.unrealengine.com/en-US/Platforms/PixelStreaming/index.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（前端）通过 iFrame 发送消息</font></font></h2><a id="user-content-front-end-send-message-via-iframe" class="anchor" aria-label="永久链接：（前端）通过 iFrame 发送消息" href="#front-end-send-message-via-iframe"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下面是如何通过 iFrame 发送消息的示例。</font></font></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-c">// Send a json message via the iFrame</span>
+<span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">"myIframe"</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">contentWindow</span><span class="pl-kos">.</span><span class="pl-en">postMessage</span><span class="pl-kos">(</span><span class="pl-c1">JSON</span><span class="pl-kos">.</span><span class="pl-en">stringify</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">jsonMessage</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-s">"*"</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="// Send a json message via the iFrame
+document.getElementById(&quot;myIframe&quot;).contentWindow.postMessage(JSON.stringify(this.jsonMessage), &quot;*&quot;);" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在我们的版本中，我们使用带有 type 属性的基本 JSON 对象，以允许更灵活地处理数据</font></font></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-en">onmessage</span> <span class="pl-c1">=</span> <span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">messageFromVue</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+   <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">"Message recieved on Signalling Server: "</span> <span class="pl-c1">+</span> <span class="pl-s1">messageFromVue</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-k">var</span> <span class="pl-s1">jsonPayload</span> <span class="pl-c1">=</span> <span class="pl-c1">JSON</span><span class="pl-kos">.</span><span class="pl-en">parse</span><span class="pl-kos">(</span><span class="pl-s1">messageFromVue</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-k">if</span><span class="pl-kos">(</span><span class="pl-s1">jsonPayload</span><span class="pl-kos">.</span><span class="pl-c1">type</span> <span class="pl-c1">==</span> <span class="pl-s">"TestType"</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+      <span class="pl-en">emitUIInteraction</span><span class="pl-kos">(</span><span class="pl-s1">jsonPayload</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-kos">}</span>
+<span class="pl-kos">}</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="window.onmessage = function(messageFromVue) {
+   console.log(&quot;Message recieved on Signalling Server: &quot; + messageFromVue.data);
    var jsonPayload = JSON.parse(messageFromVue.data);
-   if(jsonPayload.type == "TestType") {
+   if(jsonPayload.type == &quot;TestType&quot;) {
       emitUIInteraction(jsonPayload);
    }
-}
-```
-
-
-## (Front End) Recieve iFrame Message
-To recieve data sent from the signalling server, simply add a listener to the window. The window may recieve messages from various sources, so it is worthwhile adding in checks in order to handle the data appropriately.
-```javascript
-// Adds a listener for any messages coming from the iFrame
+}" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（前端）接收iFrame消息</font></font></h2><a id="user-content-front-end-recieve-iframe-message" class="anchor" aria-label="永久链接：（前端）接收 iFrame 消息" href="#front-end-recieve-iframe-message"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要接收从信令服务器发送的数据，只需向窗口添加一个监听器即可。该窗口可能会接收来自各种来源的消息，因此值得添加检查以便正确处理数据。</font></font></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-c">// Adds a listener for any messages coming from the iFrame</span>
+<span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-en">onmessage</span> <span class="pl-c1">=</span> <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">"Message Recieved from Signalling Server: "</span> <span class="pl-c1">+</span> <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="// Adds a listener for any messages coming from the iFrame
 window.onmessage = function (e) {
-  console.log("Message Recieved from Signalling Server: " + e.data);
-};
-```
-
-## (Signalling Server) Recieve iFrame Message
-Recieving data from the VueJS application can be achieved in the same way as shown above, simply add in a listener to the window. As stated, the window may recieve messages from various sources so it is worthwhile adding in checks & try catches as appropriate. The content can be added in anywhere within the app.js within the Unreal Signalling server where it will be called. For a windows build with Pixel Streaming enabled, this can be found (as of version 4.25) in: **WindowsNoEditor\WindowsNoEditor\Engine\Source\Programs\PixelStreaming\WebServers\SignallingWebServer\scripts**
-```javascript
-window.onmessage = function (messageFromVue) {
+  console.log(&quot;Message Recieved from Signalling Server: &quot; + e.data);
+};" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">(信令服务器)接收iFrame消息</font></font></h2><a id="user-content-signalling-server-recieve-iframe-message" class="anchor" aria-label="永久链接：（信令服务器）接收 iFrame 消息" href="#signalling-server-recieve-iframe-message"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从 VueJS 应用程序接收数据可以通过与上面所示相同的方式来实现，只需在窗口中添加一个侦听器即可。如前所述，窗口可能会接收来自各种来源的消息，因此值得添加适当的检查和尝试捕获。内容可以添加到虚幻信令服务器内 app.js 中将被调用的任何位置。对于启用了像素流的 Windows 版本，可以在以下位置找到（从版本 4.25 开始）：</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">WindowsNoEditor\WindowsNoEditor\Engine\Source\Programs\PixelStreaming\WebServers\SignallingWebServer\scripts</font></font></strong></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-en">onmessage</span> <span class="pl-c1">=</span> <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">messageFromVue</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// Parse the json payload</span>
+  <span class="pl-k">var</span> <span class="pl-s1">jsonPayload</span> <span class="pl-c1">=</span> <span class="pl-c1">JSON</span><span class="pl-kos">.</span><span class="pl-en">parse</span><span class="pl-kos">(</span><span class="pl-s1">messageFromVue</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-c">// If it is a message we want to send on to the Unreal Application</span>
+  <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">jsonPayload</span><span class="pl-kos">.</span><span class="pl-c1">type</span> <span class="pl-c1">==</span> <span class="pl-s">"TestType"</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-c">// Log the contents of the payload</span>
+    <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">"Message from VueJS recieved on Signalling Server: "</span> <span class="pl-c1">+</span> <span class="pl-s1">messageFromVue</span><span class="pl-kos">.</span><span class="pl-c1">data</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-c">// Send the payload  to the Unreal Application</span>
+    <span class="pl-en">emitUIInteraction</span><span class="pl-kos">(</span><span class="pl-s1">jsonPayload</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-kos">}</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="window.onmessage = function (messageFromVue) {
   // Parse the json payload
   var jsonPayload = JSON.parse(messageFromVue.data);
   // If it is a message we want to send on to the Unreal Application
-  if (jsonPayload.type == "TestType") {
+  if (jsonPayload.type == &quot;TestType&quot;) {
     // Log the contents of the payload
-    console.log("Message from VueJS recieved on Signalling Server: " + messageFromVue.data);
+    console.log(&quot;Message from VueJS recieved on Signalling Server: &quot; + messageFromVue.data);
     // Send the payload  to the Unreal Application
     emitUIInteraction(jsonPayload);
   }
-};
-```
+};" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（信令服务器）从 Unreal 接收消息并通过 iFrame 发送消息</font></font></h2><a id="user-content-signalling-server-recieve-message-from-unreal-and-send-message-via-iframe" class="anchor" aria-label="永久链接：（信令服务器）从 Unreal 接收消息并通过 iFrame 发送消息" href="#signalling-server-recieve-message-from-unreal-and-send-message-via-iframe"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要从虚幻应用程序接收消息，请调用 app.js 中名为“addResponseEventListener”的现有方法，命名侦听器并提供处理事件的方法。我们只是将调用添加到 load() 方法的底部。在此示例中，消息只是与虚幻场景中单击的对象名称相关的字符串，但如果需要，它可以是 json 对象。</font></font></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-k">function</span> <span class="pl-en">handleUnrealMessage</span><span class="pl-kos">(</span><span class="pl-s1">message</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+  <span class="pl-c">// Log the message recieved</span>
+  <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">"Message recieved on signalling server from unreal: "</span> <span class="pl-c1">+</span> <span class="pl-s1">message</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+  <span class="pl-c">// Post the data back to the VueJS app</span>
+  <span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-c1">top</span><span class="pl-kos">.</span><span class="pl-en">postMessage</span><span class="pl-kos">(</span><span class="pl-s1">message</span><span class="pl-kos">,</span> <span class="pl-s">"*"</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
 
-## (Signalling Server) Recieve Message from Unreal and Send Message via iFrame
-To recieve messages from the unreal application, call the existing method within app.js called "addResponseEventListener", naming the listener and providing a method to handle the event. We simply added our call to the bottom of the load() method. From this example, the message will simply be a string related to the name of the object clicked in the unreal scene, however it can be a json object if required.
-```javascript
-function handleUnrealMessage(message) {
+<span class="pl-k">function</span> <span class="pl-en">load</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+   <span class="pl-en">setupHtmlEvents</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-en">setupFreezeFrameOverlay</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-en">registerKeyboardEvents</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-en">start</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+   <span class="pl-en">addResponseEventListener</span><span class="pl-kos">(</span><span class="pl-s">"handle_responses"</span><span class="pl-kos">,</span> <span class="pl-s1">handleUnrealMessage</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="function handleUnrealMessage(message) {
   // Log the message recieved
-  console.log("Message recieved on signalling server from unreal: " + message);
+  console.log(&quot;Message recieved on signalling server from unreal: &quot; + message);
   // Post the data back to the VueJS app
-  window.top.postMessage(message, "*");
+  window.top.postMessage(message, &quot;*&quot;);
 }
 
 function load() {
@@ -75,34 +120,44 @@ function load() {
    setupFreezeFrameOverlay();
    registerKeyboardEvents();
    start();
-   addResponseEventListener("handle_responses", handleUnrealMessage);
-}
-```
-
-## (Signalling Server) Cursor Behavior
-As mentioned above, by setting the control scheme type (found in app.js) within the inputOptions to HoveringMouse; you will not need to click on the iFrame to begin interacting if that is desired.
-```javascript
-var inputOptions = {
+   addResponseEventListener(&quot;handle_responses&quot;, handleUnrealMessage);
+}" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（信令服务器）光标行为</font></font></h2><a id="user-content-signalling-server-cursor-behavior" class="anchor" aria-label="永久链接：（信令服务器）光标行为" href="#signalling-server-cursor-behavior"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如上所述，通过将 inputOptions 中的控制方案类型（在 app.js 中找到）设置为 HoveringMouse；如果需要，您无需单击 iFrame 即可开始交互。</font></font></p>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-k">var</span> <span class="pl-s1">inputOptions</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+  <span class="pl-c1">controlScheme</span>: <span class="pl-v">ControlSchemeType</span><span class="pl-kos">.</span><span class="pl-c1">HoveringMouse</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="var inputOptions = {
   controlScheme: ControlSchemeType.HoveringMouse,
-};
-```
-
-## (Unreal Application) Recieve Message Blueprint
-The recieve message blueprint (added to the level blueprint) is very similar to what can be found in the documentation for pixel streaming on the Unreal docs, differing only by printing a message sent via VueJS to the screen.
-![alt text](https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealRecieveMessageBP.png "Recieve Message Blueprint")
-
-## (Unreal Application) Send Message Blueprint
-The send message blueprint (also added to the level blueprint) differs slightly from what is found in the Unreal docs, simply getting the name of a clicked actor within the scene and sending back its string name. As mentioned in the unreal docs, this can be a json string also if you want to be able to handle more complex object structures.
-![alt text](https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealSendMessageBP.png "Send Message Blueprint")
-
-## (Unreal Application)Full Blueprint
-Exactly the same functionality as the two blueprints above simply merged into the same blueprint to handle both sending and recieving data from the signalling server.
-![alt text](https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealFullBP.png "Full Blueprint")
-
-## Send Message to Unreal Example
-
-![alt text](https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/FromVue.png "Full Blueprint")
-
-## Recieve Message from Unreal Example
-For clearer images of the example working see [here.](https://github.com/Slingshot-Simulations/UnrealPixelStreamingExamples/tree/IFrame-Example/ReferenceImages)
-![alt text](https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/FromUnreal.png "Full Blueprint")
+};" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（虚幻应用）接收消息蓝图</font></font></h2><a id="user-content-unreal-application-recieve-message-blueprint" class="anchor" aria-label="永久链接：（虚幻应用程序）接收消息蓝图" href="#unreal-application-recieve-message-blueprint"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">接收消息蓝图（添加到关卡蓝图）与 Unreal 文档上的像素流文档中的内容非常相似，区别仅在于将通过 VueJS 发送的消息打印到屏幕上。
+</font></font><a target="_blank" rel="noopener noreferrer" href="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealRecieveMessageBP.png"><img src="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/raw/IFrame-Example/ReferenceImages/UnrealRecieveMessageBP.png" alt="替代文本" title="接收消息蓝图" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（虚幻应用程序）发送消息蓝图</font></font></h2><a id="user-content-unreal-application-send-message-blueprint" class="anchor" aria-label="永久链接：（虚幻应用程序）发送消息蓝图" href="#unreal-application-send-message-blueprint"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">发送消息蓝图（也添加到关卡蓝图中）与虚幻文档中的内容略有不同，只是获取场景中单击的演员的名称并发送回其字符串名称。正如 unreal 文档中提到的，如果您希望能够处理更复杂的对象结构，这也可以是 json 字符串。
+</font></font><a target="_blank" rel="noopener noreferrer" href="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealSendMessageBP.png"><img src="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/raw/IFrame-Example/ReferenceImages/UnrealSendMessageBP.png" alt="替代文本" title="发送消息蓝图" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（虚幻应用）完整蓝图</font></font></h2><a id="user-content-unreal-applicationfull-blueprint" class="anchor" aria-label="永久链接：（虚幻应用程序）完整蓝图" href="#unreal-applicationfull-blueprint"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">与上面两个蓝图完全相同的功能只是合并到同一个蓝图中，以处理从信令服务器发送和接收数据。
+</font></font><a target="_blank" rel="noopener noreferrer" href="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/UnrealFullBP.png"><img src="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/raw/IFrame-Example/ReferenceImages/UnrealFullBP.png" alt="替代文本" title="完整蓝图" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">向虚幻示例发送消息</font></font></h2><a id="user-content-send-message-to-unreal-example" class="anchor" aria-label="永久链接：向虚幻示例发送消息" href="#send-message-to-unreal-example"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/FromVue.png"><img src="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/raw/IFrame-Example/ReferenceImages/FromVue.png" alt="替代文本" title="完整蓝图" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">接收来自虚幻示例的消息</font></font></h2><a id="user-content-recieve-message-from-unreal-example" class="anchor" aria-label="永久链接：从虚幻示例接收消息" href="#recieve-message-from-unreal-example"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">有关示例工作的更清晰图像，请参阅</font></font><a href="https://github.com/Slingshot-Simulations/UnrealPixelStreamingExamples/tree/IFrame-Example/ReferenceImages"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">此处。</font></font></a>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/blob/IFrame-Example/ReferenceImages/FromUnreal.png"><img src="https://github.com/Slingshot-Simulations/UnrealRenderPixelExample/raw/IFrame-Example/ReferenceImages/FromUnreal.png" alt="替代文本" title="完整蓝图" style="max-width: 100%;"></a></p>
+</article></div>
